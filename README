@@ -1,0 +1,11 @@
+This is a test project.
+----------------------
+
+Simple directory watcher with optional Swing gui. Use "true" option to enable gui.
+
+Commandline parameters:
+-----------------------
+
+java DirWatcher <directory> [true]
+
+
