@@ -1,48 +1,44 @@
 package pl.chyla.watcher;
 
-import java.io.File;
+import org.junit.*;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.hamcrest.CoreMatchers.*;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 public class WatcherProgramParamsTest {
 
-  private File testDir;
   private String testDirName = "testDirName";
 
-  @Before
-  public void setUp() {
-    testDir = new File(testDirName);
-  }
-  @Test(expected = NullPointerException.class)
-  public void testNullDirInvalid() {
+  @Test
+  public void testNullDir() {
     WatcherProgramParams params = new WatcherProgramParams(null, new Boolean(true));
-    assertFalse(params.areCorrect());
+    assertNull(params.getWatchedDirectory());
   }
 
   @Test
-  public void testNullGuiInvalid() {
+  public void testNullGuiIsFalse() {
     WatcherProgramParams params = new WatcherProgramParams(testDirName, null);
-    assertFalse(params.areCorrect());
+    assertNull(params.shouldDisplayGui());
   }
 
   @Test
   public void testDirRetrieved() {
     Boolean testGui = new Boolean(true);
     WatcherProgramParams params = new WatcherProgramParams(testDirName , testGui);
-    assertThat(params.getWatchedDirectory(), equalTo(testDir));
+    assertThat(params.getWatchedDirectory(), equalTo(testDirName));
   }
 
   @Test
-  public void testGuiOptionRetrieved() {
-    Boolean testGui = new Boolean(true);
-    WatcherProgramParams params = new WatcherProgramParams(testDirName , testGui);
-    assertThat(params.shouldDisplayGui(), equalTo(testGui));
+  public void testGuiOptionTrue() {
+    WatcherProgramParams params = new WatcherProgramParams(testDirName , true);
+    assertTrue(params.shouldDisplayGui());
+  }
+
+  @Test
+  public void testGuiOptionFalse() {
+    WatcherProgramParams params = new WatcherProgramParams(testDirName , false);
+    assertFalse(params.shouldDisplayGui());
   }
 
 }

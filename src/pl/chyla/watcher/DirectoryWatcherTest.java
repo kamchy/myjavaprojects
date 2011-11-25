@@ -1,66 +1,74 @@
 package pl.chyla.watcher;
 
-import java.io.File;
+import org.junit.*;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.hamcrest.CoreMatchers.*;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.notNullValue;
-
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
+import static org.junit.Assert.*;
 public class DirectoryWatcherTest {
 
-  private File testDir;
-  private String testDirString = getSomeExistingDirName();
+  private String testDirString = "somedirname";
 
 
-  @Before
-  public void setup() {
-    testDir = new File(testDirString);
-  }
-
-  private String getSomeExistingDirName() {
-    return System.getProperty("user.dir");
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void testNoCommandlineParams() {
+  @Test
+  public void testEmptyCommandlineCreatesCorrectParamsObject() {
     String[] paramArray = new String[]{};
-    WatcherProgramParams watcherParams = DirectoryWatcher.getProgramParameters(paramArray);
+    WatcherProgramParams params = DirectoryWatcher.getProgramParameters(paramArray);
 
-    assertThat(watcherParams, notNullValue());
+    assertThat(params, notNullValue());
+    assertNull(params.getWatchedDirectory());
+    assertFalse(params.shouldDisplayGui());
+
   }
 
   @Test
   public void testOneDirCommandlineParam() {
-
     String[] paramArray = new String[]{testDirString};
     WatcherProgramParams watcherParams = DirectoryWatcher.getProgramParameters(paramArray);
 
-    assertTrue(watcherParams.areCorrect());
-    assertThat(watcherParams.getWatchedDirectory(), equalTo(testDir));
+    assertThat(watcherParams.getWatchedDirectory(), equalTo(testDirString));
   }
 
 
   @Test
   public void testOneDirAndGuiShouldBeDisplayed() {
-    String[] paramArray = new String[]{testDirString, Boolean.toString(true)};
-    WatcherProgramParams watcherParams = DirectoryWatcher.getProgramParameters(paramArray);
-
-    assertTrue(watcherParams.areCorrect());
+    WatcherProgramParams watcherParams = createParamsForArguments(testDirString, "true");
     assertTrue(watcherParams.shouldDisplayGui());
   }
 
   @Test
   public void testOneDirAndGuiShouldNotBeDisplayed() {
-    String[] paramArray = new String[]{testDirString, Boolean.toString(false)};
-    WatcherProgramParams watcherParams = DirectoryWatcher.getProgramParameters(paramArray);
+    WatcherProgramParams watcherParams = createParamsForArguments(testDirString, "false");
+    assertThat(watcherParams.shouldDisplayGui(), is(false));
+  }
 
-    assertTrue(watcherParams.areCorrect());
-    assertTrue(! watcherParams.shouldDisplayGui());
+  @Test
+  public void testThreeParamsWithGuiOtherIgnored() {
+    WatcherProgramParams params = createParamsForArguments(testDirString, "true", "additional");
+    assertNotNull(params);
+    assertTrue(params.shouldDisplayGui());
+    assertThat(params.getWatchedDirectory(), equalTo(testDirString));
+  }
+
+  @Test
+  public void testThreeParamsNoGuiOtherIgnored() {
+    WatcherProgramParams params = createParamsForArguments(testDirString, "false", "additional");
+    assertNotNull(params);
+    assertFalse(params.shouldDisplayGui());
+    assertThat(params.getWatchedDirectory(), equalTo(testDirString));
+  }
+
+  @Test
+  public void testGuiParamIsCaseInsensitive() {
+    WatcherProgramParams params = createParamsForArguments(testDirString, "TrUe");
+    assertTrue(params.shouldDisplayGui());
+  }
+
+
+
+  private WatcherProgramParams createParamsForArguments(String... args){
+      WatcherProgramParams watcherParams = DirectoryWatcher.getProgramParameters(args);
+      return watcherParams;
   }
 
 

@@ -1,10 +1,12 @@
 package pl.chyla.watcher;
 
-import pl.chyla.util.Pair;
+
+import pl.chyla.util.*;
 
 public class WatcherProgramParams extends Pair<String, Boolean> {
 
-  public WatcherProgramParams(String first, Boolean second) {
+
+  protected WatcherProgramParams(String first, Boolean second) {
     super(first, second);
   }
 
@@ -12,7 +14,7 @@ public class WatcherProgramParams extends Pair<String, Boolean> {
     return getFirst();
   }
 
-  public boolean shouldDisplayGui() {
+  public Boolean shouldDisplayGui() {
     return getSecond();
   }
 
